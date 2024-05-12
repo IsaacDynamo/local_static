@@ -1,0 +1,10 @@
+[package]
+authors = ["Isaac Dynamo <isaacdynamo@gmail.com>"]
+license = "MIT OR Apache-2.0"
+name = "local_static"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+local_static_macros = { path = "macros" }
+portable-atomic = "1.6.0"

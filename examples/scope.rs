@@ -16,6 +16,8 @@ fn main() {
         static mut INNER: u32 = 0;
 
         // Unsafe mutation of static mut
-        unsafe { INNER += 1; }
+        unsafe {
+            INNER += 1;
+        }
     }
 }

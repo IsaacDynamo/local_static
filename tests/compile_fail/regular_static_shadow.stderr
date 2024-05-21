@@ -1,0 +1,10 @@
+error[E0428]: the name `X` is defined multiple times
+ --> tests/compile_fail/regular_static_shadow.rs:7:5
+  |
+5 |     static mut X: u32 = 0;
+  |     ---------------------- previous definition of the value `X` here
+6 |     unsafe { X += 1; }
+7 |     static mut X: u32 = 0; // ERROR
+  |     ^^^^^^^^^^^^^^^^^^^^^^ `X` redefined here
+  |
+  = note: `X` must be defined only once in the value namespace of this block

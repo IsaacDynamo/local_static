@@ -8,3 +8,6 @@ edition = "2021"
 [dependencies]
 local_static_macros = { path = "macros" }
 portable-atomic = "1.6.0"
+
+[target.'cfg(not(target_os = "none"))'.dev-dependencies]
+trybuild = "1.0.96"

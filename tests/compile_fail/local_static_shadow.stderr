@@ -1,0 +1,5 @@
+error: the name `X` is defined multiple times
+  --> tests/compile_fail/local_static_shadow.rs:10:16
+   |
+10 |     static mut X: u32 = 0; // ERROR
+   |                ^

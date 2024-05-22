@@ -1,11 +1,10 @@
-
+use std::collections::HashSet;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use quote::quote;
 use syn::{
     parse,
     parse_macro_input,
-    // spanned::Spanned,
     AttrStyle, Attribute, Item, ItemFn, Stmt,
 };
 
@@ -138,11 +137,12 @@ fn convert_static_muts(
     }.into())?;
     stmts.push(converted);
 
-
+    let mut seen = HashSet::new();
     for stmt in istmts.by_ref() {
         match &stmt {
             Stmt::Item(Item::Static(var)) => match var.mutability {
                 syn::StaticMutability::Mut(_) => {
+
                     let ident = var.ident.clone();
                     let (cfgs, _) = extract_cfgs(var.attrs.clone());
                     let converted = syn::parse::<Stmt>(quote!{
@@ -154,6 +154,20 @@ fn convert_static_muts(
                         };
                     }.into())?;
                     stmts.push(converted);
+
+                    // Test for duplicate definitions.
+                    // NOTE: This will have false positives with mutually exclusive #[cfg] attributes pairs on static muts with the same name.
+                    if seen.contains(&var.ident) {
+                        let compile_error = parse::Error::new(
+                            var.ident.span(),
+                            format!("the name `{}` is defined multiple times", var.ident),
+                        ).into_compile_error();
+                        let duplicate_err = syn::parse::<Stmt>(quote!{
+                            #compile_error
+                        }.into())?;
+                        stmts.push(duplicate_err);
+                    }
+                    seen.insert(var.ident.clone());
                 }
                 _ => stmts.push(Stmt::Item(Item::Static(var.clone()))),
             },

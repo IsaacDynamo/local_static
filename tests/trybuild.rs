@@ -5,6 +5,12 @@ fn compile_fail() {
 }
 
 #[test]
+fn compile_pass() {
+    let t = trybuild::TestCases::new();
+    t.pass("tests/compile_pass/*.rs");
+}
+
+#[test]
 fn examples() {
     let t = trybuild::TestCases::new();
     t.pass("examples/*.rs");

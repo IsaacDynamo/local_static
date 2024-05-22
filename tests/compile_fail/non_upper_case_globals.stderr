@@ -1,0 +1,12 @@
+error: static variable `snake_case` should have an upper case name
+ --> tests/compile_fail/non_upper_case_globals.rs:7:16
+  |
+7 |     static mut snake_case: u32 = 0;
+  |                ^^^^^^^^^^ help: convert the identifier to upper case: `SNAKE_CASE`
+  |
+note: the lint level is defined here
+ --> tests/compile_fail/non_upper_case_globals.rs:1:9
+  |
+1 | #![deny(warnings)]
+  |         ^^^^^^^^
+  = note: `#[deny(non_upper_case_globals)]` implied by `#[deny(warnings)]`

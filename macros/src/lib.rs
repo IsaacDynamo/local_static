@@ -114,7 +114,6 @@ pub fn local_static(args: TokenStream, input: TokenStream) -> TokenStream {
     // .into()
 }
 
-
 /// Convert `static mut` vars to `&'static mut`
 fn convert_static_muts(
     stmts: impl IntoIterator<Item = Stmt>,
@@ -123,16 +122,15 @@ fn convert_static_muts(
 
     let mut stmts = vec![];
 
+    // Add "has executed once" check to the beginning of the function.
     let converted = syn::parse::<Stmt>(quote!{
         {
+            // Use an atomic flag to ensure this function is only executed once.
             use portable_atomic::{AtomicBool, Ordering};
-
-            static ENTER_ONCE: AtomicBool = AtomicBool::new(false);
-
-            if ENTER_ONCE.swap(true, Ordering::SeqCst) == true {
-                panic!("function with local_static can only be called once");
+            static HAS_EXECUTED_ONCE: AtomicBool = AtomicBool::new(false);
+            if HAS_EXECUTED_ONCE.swap(true, Ordering::SeqCst) == true {
+                panic!("function with #[local_static] can only be executed once");
             }
-
         }
     }.into())?;
     stmts.push(converted);
@@ -142,7 +140,7 @@ fn convert_static_muts(
         match &stmt {
             Stmt::Item(Item::Static(var)) => match var.mutability {
                 syn::StaticMutability::Mut(_) => {
-
+                    // Perform `static mut` to `&'static mut` transformation
                     let ident = var.ident.clone();
                     let (cfgs, _) = extract_cfgs(var.attrs.clone());
                     let converted = syn::parse::<Stmt>(quote!{
@@ -150,6 +148,9 @@ fn convert_static_muts(
                         #[allow(non_snake_case)]
                         let #ident = {
                             #stmt;
+                            // SAFETY: Mutable reference to static variable is only created once.
+                            // This is guaranteed by the HAS_EXECUTED_ONCE check that has been injected at the start of the function.
+                            // The static mut variable is only visible in this scope, so other code cannot even attempt to create a mutable reference.
                             unsafe { &mut #ident }
                         };
                     }.into())?;

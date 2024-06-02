@@ -1,0 +1,22 @@
+name: Clippy check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  clippy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - rust: 1.78
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+            toolchain: ${{matrix.rust}}
+            components: clippy
+      - name: Clippy check
+        run: cargo clippy

@@ -21,4 +21,4 @@ Functions with `#[local_static]` attribute can only be called once.
 This crate is a generalization of a similar transformation done by the [`#[entry]`](https://docs.rs/cortex-m-rt/latest/cortex_m_rt/attr.entry.html) macro in the `cortex_m_rt` crate.
 
 # Related work
-- [static-cell](https://crates.io/crates/static_cell) provides a wrapper type that gives safe access to a `&'static mut T`.
+- [static-cell](https://crates.io/crates/static_cell) provides a wrapper type that gives a `&'static mut T` to its internals in a safe way.
